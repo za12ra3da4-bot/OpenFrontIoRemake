@@ -14,6 +14,8 @@ const factoryIcon = assetUrl("images/FactoryUnit.png");
 const missileSiloIcon = assetUrl("images/MissileSiloUnit.png");
 const SAMMissileIcon = assetUrl("images/SamLauncherUnit.png");
 const shieldIcon = assetUrl("images/ShieldIcon.png");
+const universityIcon = assetUrl("images/buildings/universityAlt1_old.png");
+const museumIcon = assetUrl("images/buildings/museumAlt1.png");
 
 export const STRUCTURE_SHAPES: Partial<Record<UnitType, ShapeType>> = {
   [UnitType.City]: "circle",
@@ -22,6 +24,8 @@ export const STRUCTURE_SHAPES: Partial<Record<UnitType, ShapeType>> = {
   [UnitType.DefensePost]: "octagon",
   [UnitType.SAMLauncher]: "square",
   [UnitType.MissileSilo]: "triangle",
+  [UnitType.University]: "circle",
+  [UnitType.Museum]: "circle",
   [UnitType.Warship]: "cross",
   [UnitType.AtomBomb]: "cross",
   [UnitType.HydrogenBomb]: "cross",
@@ -67,6 +71,8 @@ export class SpriteFactory {
     [UnitType.Port, { iconPath: anchorIcon, image: null }],
     [UnitType.MissileSilo, { iconPath: missileSiloIcon, image: null }],
     [UnitType.SAMLauncher, { iconPath: SAMMissileIcon, image: null }],
+    [UnitType.University, { iconPath: universityIcon, image: null }],
+    [UnitType.Museum, { iconPath: museumIcon, image: null }],
   ]);
   constructor(
     theme: Theme,

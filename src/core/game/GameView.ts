@@ -530,6 +530,14 @@ export class PlayerView {
     return this.data.isLobbyCreator;
   }
 
+  navalTechLevel(): number {
+    return this.data.navalTechLevel ?? 0;
+  }
+
+  landTechLevel(): number {
+    return this.data.landTechLevel ?? 0;
+  }
+
   isAlliedWith(other: PlayerView): boolean {
     return this.data.allies.some((n) => other.smallID() === n);
   }

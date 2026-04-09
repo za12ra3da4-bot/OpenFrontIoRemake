@@ -529,7 +529,9 @@
     "atom_bomb": "Atom Bomb",
     "hydrogen_bomb": "Hydrogen Bomb",
     "mirv": "MIRV",
-    "factory": "Factory"
+    "factory": "Factory",
+    "university": "University",
+    "museum": "Museum"
   },
   "user_setting": {
     "title": "Settings",
@@ -746,7 +748,9 @@
       "port": "Sends trade ships to generate gold",
       "defense_post": "Increases defenses of nearby borders",
       "city": "Increases max population",
-      "factory": "Creates railroads and spawns trains"
+      "factory": "Creates railroads and spawns trains",
+      "university": "Increases gold income per level",
+      "museum": "Brings tourism: increases gold & troop generation"
     },
     "not_enough_money": "Not enough money"
   },

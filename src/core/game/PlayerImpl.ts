@@ -105,6 +105,9 @@ export class PlayerImpl implements Player {
   private _spawnTile: TileRef | undefined;
   private _isDisconnected = false;
 
+  private _navalTechLevel: number = 0;
+  private _landTechLevel: number = 0;
+
   constructor(
     private mg: GameImpl,
     private _smallID: number,
@@ -180,6 +183,8 @@ export class PlayerImpl implements Player {
       betrayals: this._betrayalCount,
       lastDeleteUnitTick: this.lastDeleteUnitTick,
       isLobbyCreator: this.isLobbyCreator(),
+      navalTechLevel: this._navalTechLevel,
+      landTechLevel: this._landTechLevel,
     };
   }
 
@@ -945,6 +950,22 @@ export class PlayerImpl implements Player {
     return Number(toRemove);
   }
 
+  navalTechLevel(): number {
+    return this._navalTechLevel;
+  }
+
+  landTechLevel(): number {
+    return this._landTechLevel;
+  }
+
+  setNavalTechLevel(level: number): void {
+    this._navalTechLevel = Math.min(3, Math.max(0, level));
+  }
+
+  setLandTechLevel(level: number): void {
+    this._landTechLevel = Math.min(3, Math.max(0, level));
+  }
+
   captureUnit(unit: Unit): void {
     if (unit.owner() === this) {
       throw new Error(`Cannot capture unit, ${this} already owns ${unit}`);
@@ -1164,6 +1185,8 @@ export class PlayerImpl implements Player {
       case UnitType.SAMLauncher:
       case UnitType.City:
       case UnitType.Factory:
+      case UnitType.University:
+      case UnitType.Museum:
         return this.landBasedStructureSpawn(targetTile, validTiles);
       default:
         assertNever(unitType);

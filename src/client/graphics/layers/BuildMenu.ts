@@ -29,6 +29,8 @@ import { Layer } from "./Layer";
 const warshipIcon = assetUrl("images/BattleshipIconWhite.svg");
 const cityIcon = assetUrl("images/CityIconWhite.svg");
 const factoryIcon = assetUrl("images/FactoryIconWhite.svg");
+const universityIcon = assetUrl("images/UniversityIconWhite.svg");
+const museumIcon = assetUrl("images/MuseumIconWhite.svg");
 const goldCoinIcon = assetUrl("images/GoldCoinIcon.svg");
 const mirvIcon = assetUrl("images/MIRVIcon.svg");
 const missileSiloIcon = assetUrl("images/MissileSiloIconWhite.svg");
@@ -116,6 +118,23 @@ export const buildTable: BuildItemDisplay[][] = [
       icon: factoryIcon,
       description: "build_menu.desc.factory",
       key: "unit_type.factory",
+      countable: true,
+    },
+    {
+      unitType: UnitType.University,
+      icon: universityIcon,
+      description: "build_menu.desc.university",
+      key: "unit_type.university",
+      countable: true,
+    },
+  ],
+  // ── Row 2: tourism / culture (below City) ──────────────────────────────
+  [
+    {
+      unitType: UnitType.Museum,
+      icon: museumIcon,
+      description: "build_menu.desc.museum",
+      key: "unit_type.museum",
       countable: true,
     },
   ],

@@ -144,6 +144,8 @@ export class ToggleCoordinateGridEvent implements GameEvent {
   constructor(public readonly enabled: boolean) {}
 }
 
+export class ToggleResearchTreeEvent implements GameEvent {}
+
 export class TickMetricsEvent implements GameEvent {
   constructor(
     public readonly tickExecutionDuration?: number,
@@ -242,6 +244,8 @@ export class InputHandler {
       buildAtomBomb: "Digit8",
       buildHydrogenBomb: "Digit9",
       buildMIRV: "Digit0",
+      buildUniversity: "Minus",
+      buildMuseum: "Equal",
       pauseGame: "KeyP",
       gameSpeedUp: "Period",
       gameSpeedDown: "Comma",
@@ -363,6 +367,11 @@ export class InputHandler {
         e.preventDefault();
         this.eventBus.emit(new CloseViewEvent());
         this.setGhostStructure(null);
+      }
+
+      if (e.code === "KeyR" && !e.altKey && !e.ctrlKey && !e.metaKey && !e.repeat) {
+        e.preventDefault();
+        this.eventBus.emit(new ToggleResearchTreeEvent());
       }
 
       if (
@@ -725,6 +734,8 @@ export class InputHandler {
       { key: "buildHydrogenBomb", type: UnitType.HydrogenBomb },
       { key: "buildWarship", type: UnitType.Warship },
       { key: "buildMIRV", type: UnitType.MIRV },
+      { key: "buildUniversity", type: UnitType.University },
+      { key: "buildMuseum", type: UnitType.Museum },
     ];
     for (const { key, type } of buildKeybinds) {
       if (this.buildKeybindMatches(code, this.keybinds[key])) return type;

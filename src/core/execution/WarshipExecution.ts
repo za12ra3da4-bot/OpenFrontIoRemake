@@ -47,6 +47,14 @@ export class WarshipExecution implements Execution {
         spawn,
         this.input,
       );
+      // Naval Level 3: warship health 2x
+      const healthMult = mg
+        .config()
+        .warshipHealthMultiplier(this.input.owner);
+      if (healthMult > 1) {
+        const maxHealth = mg.unitInfo(UnitType.Warship).maxHealth ?? 1000;
+        this.warship.modifyHealth(maxHealth * (healthMult - 1));
+      }
     }
   }
 
@@ -81,7 +89,9 @@ export class WarshipExecution implements Execution {
     const owner = this.warship.owner();
     const hasPort = owner.unitCount(UnitType.Port) > 0;
     const patrolTile = this.warship.patrolTile()!;
-    const patrolRangeSquared = config.warshipPatrolRange() ** 2;
+    const patrolRangeMultiplier = config.warshipPatrolRangeMultiplier(owner);
+    const patrolRangeSquared =
+      (config.warshipPatrolRange() * patrolRangeMultiplier) ** 2;
 
     const ships = mg.nearbyUnits(
       this.warship.tile()!,
@@ -111,6 +121,13 @@ export class WarshipExecution implements Execution {
           unit.targetUnit()?.owner() === owner || // trade ship is coming to my port
           unit.targetUnit()?.owner().isFriendly(owner) // trade ship is coming to my ally
         ) {
+          continue;
+        }
+        // Naval Level 2: trade ships have 75% evasion chance
+        const evasionChance = mg
+          .config()
+          .tradeShipEvasionChance(unit.owner());
+        if (evasionChance > 0 && this.random.chance(evasionChance)) {
           continue;
         }
         if (
@@ -150,7 +167,12 @@ export class WarshipExecution implements Execution {
   }
 
   private shootTarget() {
-    const shellAttackRate = this.mg.config().warshipShellAttackRate();
+    const owner = this.warship.owner();
+    const rateMultiplier = this.mg
+      .config()
+      .warshipShellAttackRateMultiplier(owner);
+    const shellAttackRate =
+      this.mg.config().warshipShellAttackRate() * rateMultiplier;
     if (this.mg.ticks() - this.lastShellAttack > shellAttackRate) {
       if (this.warship.targetUnit()?.type() !== UnitType.TransportShip) {
         // Warships don't need to reload when attacking transport ships.

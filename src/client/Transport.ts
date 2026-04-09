@@ -81,6 +81,10 @@ export class SendBoatAttackIntentEvent implements GameEvent {
   ) {}
 }
 
+export class ResearchTechIntentEvent implements GameEvent {
+  constructor(public readonly tree: "naval" | "land") {}
+}
+
 export class BuildUnitIntentEvent implements GameEvent {
   constructor(
     public readonly unit: UnitType,
@@ -236,6 +240,9 @@ export class Transport {
       this.onSendEmbargoAllIntent(e),
     );
     this.eventBus.on(BuildUnitIntentEvent, (e) => this.onBuildUnitIntent(e));
+    this.eventBus.on(ResearchTechIntentEvent, (e) =>
+      this.onResearchTechIntent(e),
+    );
 
     this.eventBus.on(PauseGameIntentEvent, (e) => this.onPauseGameIntent(e));
     this.eventBus.on(SendWinnerEvent, (e) => this.onSendWinnerEvent(e));
@@ -559,6 +566,13 @@ export class Transport {
       unit: event.unit,
       tile: event.tile,
       rocketDirectionUp: event.rocketDirectionUp,
+    });
+  }
+
+  private onResearchTechIntent(event: ResearchTechIntentEvent) {
+    this.sendIntent({
+      type: "research_tech",
+      tree: event.tree,
     });
   }
 

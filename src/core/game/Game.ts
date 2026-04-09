@@ -303,6 +303,8 @@ export enum UnitType {
   MIRVWarhead = "MIRV Warhead",
   Train = "Train",
   Factory = "Factory",
+  University = "University",
+  Museum = "Museum",
 }
 
 export enum TrainType {
@@ -332,6 +334,8 @@ export const Structures = unitTypeGroup([
   UnitType.MissileSilo,
   UnitType.Port,
   UnitType.Factory,
+  UnitType.University,
+  UnitType.Museum,
 ] as const);
 
 export const BuildMenus = unitTypeGroup([
@@ -400,6 +404,10 @@ export interface UnitParamsMap {
   [UnitType.SAMLauncher]: Record<string, never>;
 
   [UnitType.City]: Record<string, never>;
+
+  [UnitType.University]: Record<string, never>;
+
+  [UnitType.Museum]: Record<string, never>;
 
   [UnitType.MIRV]: {
     targetTile?: number;
@@ -688,6 +696,12 @@ export interface Player {
   setTroops(troops: number): void;
   addTroops(troops: number): void;
   removeTroops(troops: number): number;
+
+  // Research Tech Levels
+  navalTechLevel(): number;
+  landTechLevel(): number;
+  setNavalTechLevel(level: number): void;
+  setLandTechLevel(level: number): void;
 
   // Units
   units(...types: UnitType[]): Unit[];

@@ -11,6 +11,8 @@ import { GameUpdateType } from "../../../core/game/GameUpdates";
 import { GameView, UnitView } from "../../../core/game/GameView";
 const cityIcon = assetUrl("images/buildings/cityAlt1.png");
 const factoryIcon = assetUrl("images/buildings/factoryAlt1.png");
+const universityIcon = assetUrl("images/buildings/universityAlt1.png");
+const museumIcon = assetUrl("images/buildings/museumAlt1.png");
 const shieldIcon = assetUrl("images/buildings/fortAlt3.png");
 const anchorIcon = assetUrl("images/buildings/port1.png");
 const missileSiloIcon = assetUrl("images/buildings/silo1.png");
@@ -67,6 +69,16 @@ export class StructureLayer implements Layer {
     },
     [UnitType.SAMLauncher]: {
       icon: SAMMissileIcon,
+      borderRadius: BASE_BORDER_RADIUS * RADIUS_SCALE_FACTOR,
+      territoryRadius: BASE_TERRITORY_RADIUS * RADIUS_SCALE_FACTOR,
+    },
+    [UnitType.University]: {
+      icon: universityIcon,
+      borderRadius: BASE_BORDER_RADIUS * RADIUS_SCALE_FACTOR,
+      territoryRadius: BASE_TERRITORY_RADIUS * RADIUS_SCALE_FACTOR,
+    },
+    [UnitType.Museum]: {
+      icon: museumIcon,
       borderRadius: BASE_BORDER_RADIUS * RADIUS_SCALE_FACTOR,
       territoryRadius: BASE_TERRITORY_RADIUS * RADIUS_SCALE_FACTOR,
     },

@@ -472,7 +472,9 @@
     "atom_bomb": "원자 폭탄",
     "hydrogen_bomb": "수소 폭탄",
     "mirv": "다탄두 미사일",
-    "factory": "공장"
+    "factory": "공장",
+    "university": "대학교",
+    "museum": "박물관"
   },
   "user_setting": {
     "title": "설정",
@@ -676,7 +678,9 @@
       "port": "무역선을 보내 금을 생산합니다",
       "defense_post": "주변 경계의 방어력을 강화합니다",
       "city": "최대 인구 수를 증가시킵니다",
-      "factory": "철도를 만들고 기차를 생성합니다"
+      "factory": "철도를 만들고 기차를 생성합니다",
+      "university": "레벨당 금 수입을 증가시킵니다",
+      "museum": "관광을 통해 금 수입과 병력 생산 속도를 증가시킵니다"
     },
     "not_enough_money": "돈이 부족합니다"
   },

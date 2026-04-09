@@ -109,9 +109,18 @@ export interface Config {
   proximityBonusPortsNb(totalPorts: number): number;
   maxTroops(player: Player | PlayerView): number;
   cityTroopIncrease(): number;
+  universityGoldIncrease(): number;
+  museumGoldIncrease(): number;
+  museumTroopBonus(): number;
   boatAttackAmount(attacker: Player, defender: Player | TerraNullius): number;
   shellLifetime(): number;
-  boatMaxNumber(): number;
+  boatMaxNumber(player?: Player): number;
+  boatTicksPerMove(player?: Player): number;
+  warshipHealthMultiplier(player?: Player): number;
+  warshipShellAttackRateMultiplier(player?: Player): number;
+  warshipPatrolRangeMultiplier(player?: Player): number;
+  tradeShipEvasionChance(player?: Player): number;
+  tradeShipSpeedMultiplier(player?: Player): number;
   allianceDuration(): Tick;
   allianceRequestDuration(): Tick;
   allianceRequestCooldown(): Tick;
@@ -135,6 +144,7 @@ export interface Config {
   trainGold(
     rel: "self" | "team" | "ally" | "other",
     citiesVisited: number,
+    player?: Player,
   ): Gold;
   trainSpawnRate(numPlayerFactories: number): number;
   trainStationMinRange(): number;

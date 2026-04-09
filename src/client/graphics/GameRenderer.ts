@@ -2,7 +2,7 @@ import { EventBus } from "../../core/EventBus";
 import { GameView } from "../../core/game/GameView";
 import { UserSettings } from "../../core/game/UserSettings";
 import { GameStartingModal } from "../GameStartingModal";
-import { RefreshGraphicsEvent as RedrawGraphicsEvent } from "../InputHandler";
+import { RefreshGraphicsEvent as RedrawGraphicsEvent, ToggleResearchTreeEvent } from "../InputHandler";
 import { FrameProfiler } from "./FrameProfiler";
 import { TransformHandler } from "./TransformHandler";
 import { UIState } from "./UIState";
@@ -44,6 +44,7 @@ import { TerrainLayer } from "./layers/TerrainLayer";
 import { TerritoryLayer } from "./layers/TerritoryLayer";
 import { UILayer } from "./layers/UILayer";
 import { UnitDisplay } from "./layers/UnitDisplay";
+import { ResearchTreeLayer } from "./layers/ResearchTreeLayer";
 import { UnitLayer } from "./layers/UnitLayer";
 import { WinModal } from "./layers/WinModal";
 
@@ -194,6 +195,16 @@ export function createRenderer(
   unitDisplay.game = game;
   unitDisplay.eventBus = eventBus;
   unitDisplay.uiState = uiState;
+
+  // Research Tree
+  const researchTree = document.querySelector("research-tree-layer") as ResearchTreeLayer;
+  if (!(researchTree instanceof ResearchTreeLayer)) {
+    console.error("research-tree-layer not found in DOM");
+  }
+  researchTree.game = game;
+  researchTree.eventBus = eventBus;
+  unitDisplay.onResearchClick = () => researchTree.toggle();
+  eventBus.on(ToggleResearchTreeEvent, () => researchTree.toggle());
 
   const playerPanel = document.querySelector("player-panel") as PlayerPanel;
   if (!(playerPanel instanceof PlayerPanel)) {

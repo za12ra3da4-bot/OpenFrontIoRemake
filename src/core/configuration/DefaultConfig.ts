@@ -198,6 +198,18 @@ export class DefaultConfig implements Config {
     return 250_000;
   }
 
+  universityGoldIncrease(): number {
+    return 50;
+  }
+
+  museumGoldIncrease(): number {
+    return 60;
+  }
+
+  museumTroopBonus(): number {
+    return 30_000;
+  }
+
   falloutDefenseModifier(falloutRatio: number): number {
     // falloutRatio is between 0 and 1
     // So defense modifier is between [5, 2.5]
@@ -279,6 +291,7 @@ export class DefaultConfig implements Config {
   trainGold(
     rel: "self" | "team" | "ally" | "other",
     citiesVisited: number,
+    player?: Player,
   ): Gold {
     // No penalty for the first 10 cities.
     citiesVisited = Math.max(0, citiesVisited - 9);
@@ -294,6 +307,10 @@ export class DefaultConfig implements Config {
       case "self":
         baseGold = 10_000;
         break;
+    }
+    // Land Level 2: +5k gold per structure visited
+    if (player && player.landTechLevel() >= 2) {
+      baseGold += 5_000;
     }
     const distPenalty = citiesVisited * 5_000;
     const gold = Math.max(5000, baseGold - distPenalty);
@@ -462,6 +479,28 @@ export class DefaultConfig implements Config {
           upgradable: true,
         };
         break;
+      case UnitType.University:
+        info = {
+          cost: this.costWrapper(
+            (numUnits: number) =>
+              Math.min(2_000_000, Math.pow(2, numUnits) * 250_000),
+            UnitType.University,
+          ),
+          constructionDuration: this.instantBuild() ? 0 : 3 * 10,
+          upgradable: true,
+        };
+        break;
+      case UnitType.Museum:
+        info = {
+          cost: this.costWrapper(
+            (numUnits: number) =>
+              Math.min(3_000_000, Math.pow(2, numUnits) * 400_000),
+            UnitType.Museum,
+          ),
+          constructionDuration: this.instantBuild() ? 0 : 3 * 10,
+          upgradable: true,
+        };
+        break;
       case UnitType.Train:
         info = {
           cost: () => 0n,
@@ -543,11 +582,46 @@ export class DefaultConfig implements Config {
     }
     return 80;
   }
-  boatMaxNumber(): number {
+  boatMaxNumber(player?: Player): number {
     if (this.isUnitDisabled(UnitType.TransportShip)) {
       return 0;
     }
+    if (player && player.navalTechLevel() >= 1) return 6;
     return 3;
+  }
+
+  boatTicksPerMove(player?: Player): number {
+    // Lower = faster. Naval Level 1: 1.25x speed (move every 0.8 ticks → use 1 but move 2 tiles at once handled in execution)
+    // We use a multiplier approach: base=1, naval1=0.8 effectively by skipping less
+    if (player && player.navalTechLevel() >= 1) return 0.8;
+    return 1;
+  }
+
+  warshipHealthMultiplier(player?: Player): number {
+    if (player && player.navalTechLevel() >= 3) return 2;
+    return 1;
+  }
+
+  warshipShellAttackRateMultiplier(player?: Player): number {
+    // Lower rate = faster reload. Naval Level 3: -25% reload time
+    if (player && player.navalTechLevel() >= 3) return 0.75;
+    return 1;
+  }
+
+  warshipPatrolRangeMultiplier(player?: Player): number {
+    if (player && player.navalTechLevel() >= 3) return 1.75;
+    return 1;
+  }
+
+  tradeShipEvasionChance(player?: Player): number {
+    // Naval Level 2: 75% chance to not be detected
+    if (player && player.navalTechLevel() >= 2) return 0.75;
+    return 0;
+  }
+
+  tradeShipSpeedMultiplier(player?: Player): number {
+    if (player && player.navalTechLevel() >= 2) return 1.25;
+    return 1;
   }
   numSpawnPhaseTurns(): number {
     if (this._gameConfig.gameType === GameType.Singleplayer) {
@@ -668,8 +742,16 @@ export class DefaultConfig implements Config {
         traitorMod;
       const altAttackerLoss =
         1.3 * defenderTroopLoss * (mag / 100) * traitorMod;
-      const attackerTroopLoss =
+      let attackerTroopLoss =
         0.7 * currentAttackerLoss + 0.3 * altAttackerLoss;
+
+      // Land Level 3: -25% troop loss
+      if (attacker.landTechLevel() >= 3) {
+        attackerTroopLoss *= 0.75;
+      }
+
+      // Land Level 3: +15% attack speed (lower tilesPerTick = faster)
+      const landSpeedMult = attacker.landTechLevel() >= 3 ? 1 / 1.15 : 1;
 
       return {
         attackerTroopLoss,
@@ -679,7 +761,8 @@ export class DefaultConfig implements Config {
           speed *
           largeDefenderSpeedDebuff *
           largeAttackerSpeedBonus *
-          (defender.isTraitor() ? this.traitorSpeedDebuff() : 1),
+          (defender.isTraitor() ? this.traitorSpeedDebuff() : 1) *
+          landSpeedMult,
       };
     } else {
       return {
@@ -770,7 +853,12 @@ export class DefaultConfig implements Config {
             .units(UnitType.City)
             .map((city) => city.level())
             .reduce((a, b) => a + b, 0) *
-            this.cityTroopIncrease();
+            this.cityTroopIncrease() +
+          player
+            .units(UnitType.Museum)
+            .map((m) => m.level())
+            .reduce((a, b) => a + b, 0) *
+            this.museumTroopBonus();
 
     if (player.type() === PlayerType.Bot) {
       return maxTroops / 3;
@@ -825,6 +913,11 @@ export class DefaultConfig implements Config {
       }
     }
 
+    // Land Level 3: +35% troop generation speed
+    if (player.landTechLevel() >= 3) {
+      toAdd *= 1.35;
+    }
+
     return Math.min(player.troops() + toAdd, max) - player.troops();
   }
 
@@ -836,7 +929,19 @@ export class DefaultConfig implements Config {
     } else {
       baseRate = 100n;
     }
-    return BigInt(Math.floor(Number(baseRate) * multiplier));
+    const universityBonus = BigInt(
+      player
+        .units(UnitType.University)
+        .map((u) => u.level())
+        .reduce((a, b) => a + b, 0) * this.universityGoldIncrease(),
+    );
+    const museumBonus = BigInt(
+      player
+        .units(UnitType.Museum)
+        .map((u) => u.level())
+        .reduce((a, b) => a + b, 0) * this.museumGoldIncrease(),
+    );
+    return BigInt(Math.floor(Number(baseRate) * multiplier)) + universityBonus + museumBonus;
   }
 
   nukeMagnitudes(unitType: UnitType): NukeMagnitude {

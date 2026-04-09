@@ -188,6 +188,8 @@ export interface PlayerUpdate {
   betrayals: number;
   lastDeleteUnitTick: Tick;
   isLobbyCreator: boolean;
+  navalTechLevel: number;
+  landTechLevel: number;
 }
 
 export interface AllianceView {

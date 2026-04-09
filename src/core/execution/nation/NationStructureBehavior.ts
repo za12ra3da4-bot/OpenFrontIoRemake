@@ -51,6 +51,14 @@ function getStructureRatios(
       ratioPerCity: 0.75,
       perceivedCostIncreasePerOwned: 1,
     },
+    [UnitType.University]: {
+      ratioPerCity: 0.5,
+      perceivedCostIncreasePerOwned: 1,
+    },
+    [UnitType.Museum]: {
+      ratioPerCity: 0.4,
+      perceivedCostIncreasePerOwned: 1,
+    },
     [UnitType.DefensePost]: {
       ratioPerCity: 0.25,
       perceivedCostIncreasePerOwned: 1,
@@ -114,6 +122,8 @@ export class NationStructureBehavior {
       UnitType.DefensePost,
       UnitType.Port,
       UnitType.Factory,
+      UnitType.University,
+      UnitType.Museum,
       UnitType.SAMLauncher,
       UnitType.MissileSilo,
     ];
@@ -509,6 +519,10 @@ export class NationStructureBehavior {
         return this.defensePostValue();
       case UnitType.SAMLauncher:
         return this.samLauncherValue();
+      case UnitType.University:
+        return this.universityValue();
+      case UnitType.Museum:
+        return this.museumValue();
       default:
         throw new Error(`Value function not implemented for ${type}`);
     }
@@ -1015,6 +1029,66 @@ export class NationStructureBehavior {
             w += structureSpacing * entry.weight;
           }
         }
+      }
+
+      return w;
+    };
+  }
+
+  /**
+   * Value function for universities.
+   * Prefers spacing from other universities and being away from the border.
+   */
+  private universityValue(): (tile: TileRef) => number {
+    const game = this.game;
+    const borderTiles = this.player.borderTiles();
+    const otherUnits = this.player.units(UnitType.University);
+    const { borderSpacing, structureSpacing } = this.spacingConstants();
+
+    return (tile) => {
+      let w = 0;
+
+      // Prefer to be away from the border
+      const [, closestBorderDist] = closestTile(game, borderTiles, tile);
+      w += Math.min(closestBorderDist, borderSpacing);
+
+      // Prefer to be away from other universities
+      const otherTiles: Set<TileRef> = new Set(otherUnits.map((u) => u.tile()));
+      otherTiles.delete(tile);
+      const closestOther = closestTwoTiles(game, otherTiles, [tile]);
+      if (closestOther !== null) {
+        const d = game.manhattanDist(closestOther.x, tile);
+        w += Math.min(d, structureSpacing);
+      }
+
+      return w;
+    };
+  }
+
+  /**
+   * Value function for museums.
+   * Prefers spacing from other museums and being away from the border.
+   */
+  private museumValue(): (tile: TileRef) => number {
+    const game = this.game;
+    const borderTiles = this.player.borderTiles();
+    const otherUnits = this.player.units(UnitType.Museum);
+    const { borderSpacing, structureSpacing } = this.spacingConstants();
+
+    return (tile) => {
+      let w = 0;
+
+      // Prefer to be away from the border
+      const [, closestBorderDist] = closestTile(game, borderTiles, tile);
+      w += Math.min(closestBorderDist, borderSpacing);
+
+      // Prefer to be away from other museums
+      const otherTiles: Set<TileRef> = new Set(otherUnits.map((u) => u.tile()));
+      otherTiles.delete(tile);
+      const closestOther = closestTwoTiles(game, otherTiles, [tile]);
+      if (closestOther !== null) {
+        const d = game.manhattanDist(closestOther.x, tile);
+        w += Math.min(d, structureSpacing);
       }
 
       return w;

@@ -28,12 +28,15 @@ const atomBombIcon = assetUrl("images/NukeIconWhite.svg");
 const portIcon = assetUrl("images/PortIcon.svg");
 const samLauncherIcon = assetUrl("images/SamLauncherIconWhite.svg");
 const defensePostIcon = assetUrl("images/ShieldIconWhite.svg");
+const universityIcon = assetUrl("images/UniversityIconWhite.svg");
+const museumIcon = assetUrl("images/MuseumIconWhite.svg");
 
 @customElement("unit-display")
 export class UnitDisplay extends LitElement implements Layer {
   public game: GameView;
   public eventBus: EventBus;
   public uiState: UIState;
+  public onResearchClick: (() => void) | null = null;
   private playerBuildables: BuildableUnit[] | null = null;
   private keybinds: Record<string, { value: string; key: string }> = {};
   private _cities = 0;
@@ -43,6 +46,8 @@ export class UnitDisplay extends LitElement implements Layer {
   private _port = 0;
   private _defensePost = 0;
   private _samLauncher = 0;
+  private _universities = 0;
+  private _museums = 0;
   private allDisabled = false;
   private _hoveredUnit: PlayerBuildableUnitType | null = null;
 
@@ -108,6 +113,8 @@ export class UnitDisplay extends LitElement implements Layer {
     this._defensePost = player.totalUnitLevels(UnitType.DefensePost);
     this._samLauncher = player.totalUnitLevels(UnitType.SAMLauncher);
     this._factories = player.totalUnitLevels(UnitType.Factory);
+    this._universities = player.totalUnitLevels(UnitType.University);
+    this._museums = player.totalUnitLevels(UnitType.Museum);
     this._warships = player.totalUnitLevels(UnitType.Warship);
     this.requestUpdate();
   }
@@ -128,79 +135,108 @@ export class UnitDisplay extends LitElement implements Layer {
 
     return html`
       <div class="border-t border-white/10 p-0.5 w-full">
-        <div
-          class="grid grid-rows-1 auto-cols-max grid-flow-col gap-0.5 w-fit mx-auto"
-        >
-          ${this.renderUnitItem(
-            cityIcon,
-            this._cities,
-            UnitType.City,
-            "city",
-            this.keybinds["buildCity"]?.key ?? "1",
-          )}
-          ${this.renderUnitItem(
-            factoryIcon,
-            this._factories,
-            UnitType.Factory,
-            "factory",
-            this.keybinds["buildFactory"]?.key ?? "2",
-          )}
-          ${this.renderUnitItem(
-            portIcon,
-            this._port,
-            UnitType.Port,
-            "port",
-            this.keybinds["buildPort"]?.key ?? "3",
-          )}
-          ${this.renderUnitItem(
-            defensePostIcon,
-            this._defensePost,
-            UnitType.DefensePost,
-            "defense_post",
-            this.keybinds["buildDefensePost"]?.key ?? "4",
-          )}
-          ${this.renderUnitItem(
-            missileSiloIcon,
-            this._missileSilo,
-            UnitType.MissileSilo,
-            "missile_silo",
-            this.keybinds["buildMissileSilo"]?.key ?? "5",
-          )}
-          ${this.renderUnitItem(
-            samLauncherIcon,
-            this._samLauncher,
-            UnitType.SAMLauncher,
-            "sam_launcher",
-            this.keybinds["buildSamLauncher"]?.key ?? "6",
-          )}
-          ${this.renderUnitItem(
-            warshipIcon,
-            this._warships,
-            UnitType.Warship,
-            "warship",
-            this.keybinds["buildWarship"]?.key ?? "7",
-          )}
-          ${this.renderUnitItem(
-            atomBombIcon,
-            null,
-            UnitType.AtomBomb,
-            "atom_bomb",
-            this.keybinds["buildAtomBomb"]?.key ?? "8",
-          )}
-          ${this.renderUnitItem(
-            hydrogenBombIcon,
-            null,
-            UnitType.HydrogenBomb,
-            "hydrogen_bomb",
-            this.keybinds["buildHydrogenBomb"]?.key ?? "9",
-          )}
-          ${this.renderUnitItem(
-            mirvIcon,
-            null,
-            UnitType.MIRV,
-            "mirv",
-            this.keybinds["buildMIRV"]?.key ?? "0",
-          )}
+        <!-- outer wrapper: centered, two rows stacked -->
+        <div class="flex flex-col w-fit mx-auto gap-0.5">
+
+          <!-- ── ROW 1: main hotbar (1 ~ −) ── -->
+          <div class="flex gap-0.5 items-center">
+            ${this.renderUnitItem(
+              cityIcon,
+              this._cities,
+              UnitType.City,
+              "city",
+              this.keybinds["buildCity"]?.key ?? "1",
+            )}
+            ${this.renderUnitItem(
+              factoryIcon,
+              this._factories,
+              UnitType.Factory,
+              "factory",
+              this.keybinds["buildFactory"]?.key ?? "2",
+            )}
+            ${this.renderUnitItem(
+              portIcon,
+              this._port,
+              UnitType.Port,
+              "port",
+              this.keybinds["buildPort"]?.key ?? "3",
+            )}
+            ${this.renderUnitItem(
+              defensePostIcon,
+              this._defensePost,
+              UnitType.DefensePost,
+              "defense_post",
+              this.keybinds["buildDefensePost"]?.key ?? "4",
+            )}
+            ${this.renderUnitItem(
+              missileSiloIcon,
+              this._missileSilo,
+              UnitType.MissileSilo,
+              "missile_silo",
+              this.keybinds["buildMissileSilo"]?.key ?? "5",
+            )}
+            ${this.renderUnitItem(
+              samLauncherIcon,
+              this._samLauncher,
+              UnitType.SAMLauncher,
+              "sam_launcher",
+              this.keybinds["buildSamLauncher"]?.key ?? "6",
+            )}
+            ${this.renderUnitItem(
+              warshipIcon,
+              this._warships,
+              UnitType.Warship,
+              "warship",
+              this.keybinds["buildWarship"]?.key ?? "7",
+            )}
+            ${this.renderUnitItem(
+              atomBombIcon,
+              null,
+              UnitType.AtomBomb,
+              "atom_bomb",
+              this.keybinds["buildAtomBomb"]?.key ?? "8",
+            )}
+            ${this.renderUnitItem(
+              hydrogenBombIcon,
+              null,
+              UnitType.HydrogenBomb,
+              "hydrogen_bomb",
+              this.keybinds["buildHydrogenBomb"]?.key ?? "9",
+            )}
+            ${this.renderUnitItem(
+              mirvIcon,
+              null,
+              UnitType.MIRV,
+              "mirv",
+              this.keybinds["buildMIRV"]?.key ?? "0",
+            )}
+            ${this.renderUnitItem(
+              universityIcon,
+              this._universities,
+              UnitType.University,
+              "university",
+              this.keybinds["buildUniversity"]?.key ?? "Minus",
+            )}
+            <div
+              class="border border-purple-500 rounded-sm px-1 pb-0.5 flex items-center gap-0.5 cursor-pointer hover:bg-purple-800/30 text-purple-300 text-xs font-bold"
+              title="Research Tree [R]"
+              @click=${() => this.onResearchClick?.()}
+            >
+              🔬
+            </div>
+          </div>
+
+          <!-- ── ROW 2: culture row (= key) — Museum below City ── -->
+          <div class="flex gap-0.5 items-center">
+            ${this.renderUnitItem(
+              museumIcon,
+              this._museums,
+              UnitType.Museum,
+              "museum",
+              this.keybinds["buildMuseum"]?.key ?? "=",
+            )}
+          </div>
+
         </div>
       </div>
     `;

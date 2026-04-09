@@ -27,6 +27,7 @@ import { TargetPlayerExecution } from "./TargetPlayerExecution";
 import { TransportShipExecution } from "./TransportShipExecution";
 import { TribeSpawner } from "./TribeSpawner";
 import { UpgradeStructureExecution } from "./UpgradeStructureExecution";
+import { ResearchExecution } from "./ResearchExecution";
 import { PlayerSpawner } from "./utils/PlayerSpawner";
 
 export class Executor {
@@ -121,6 +122,8 @@ export class Executor {
         return new MarkDisconnectedExecution(player, intent.isDisconnected);
       case "toggle_pause":
         return new PauseExecution(player, intent.paused);
+      case "research_tech":
+        return new ResearchExecution(player, intent.tree);
       default:
         throw new Error(`intent type ${intent} not found`);
     }
