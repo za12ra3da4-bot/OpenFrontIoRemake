@@ -119,17 +119,12 @@ export default defineConfig(({ mode }) => {
     ],
 
     define: {
-      __ASSET_MANIFEST__: JSON.stringify(assetManifest),
-      "process.env.WEBSOCKET_URL": JSON.stringify(
-        isProduction ? "wss://open-front-io-remake.vercel.app" : "localhost:3000",
-      ),
-      "process.env.GAME_ENV": JSON.stringify(isProduction ? "prod" : "dev"),
-      "process.env.STRIPE_PUBLISHABLE_KEY": JSON.stringify(
-        env.STRIPE_PUBLISHABLE_KEY,
-      ),
-      "process.env.API_DOMAIN": JSON.stringify(env.API_DOMAIN),
-      // Add other process.env variables if needed, OR migrate code to import.meta.env
-    },
+    "process.env.WEBSOCKET_URL": JSON.stringify(
+      isProduction ? "wss://open-front-io-remake.vercel.app" : "ws://localhost:3000"
+    ),
+    "process.env.GAME_ENV": JSON.stringify(isProduction ? "prod" : "dev"),
+    // ... 나머지 설정
+  },
 
     build: {
       outDir: "static", // Webpack outputs to 'static', assuming we want to keep this.
