@@ -70,7 +70,7 @@ COPY . .
 COPY --from=build /usr/src/app ./
 
 RUN mkdir -p static
-RUN cp -r OpenFrontIO/* static/
+RUN cp -r ./* static/
 
 RUN echo "$GIT_COMMIT" > static/commit.txt
 
