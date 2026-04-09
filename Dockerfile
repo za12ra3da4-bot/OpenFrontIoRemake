@@ -63,11 +63,14 @@ COPY --from=prod-deps /usr/src/app/node_modules ./node_modules
 COPY package*.json ./
 
 # Copy built artifacts from build stage
+# build stage에서
+COPY . .
+
+# final stage
 COPY --from=build /usr/src/app ./
 
-# 핵심
 RUN mkdir -p static
-RUN cp -r OpenfrontIO/* static/
+RUN cp -r OpenFrontIO/* static/
 
 RUN echo "$GIT_COMMIT" > static/commit.txt
 
