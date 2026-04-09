@@ -121,7 +121,7 @@ export default defineConfig(({ mode }) => {
     define: {
       __ASSET_MANIFEST__: JSON.stringify(assetManifest),
       "process.env.WEBSOCKET_URL": JSON.stringify(
-        isProduction ? "" : "localhost:3000",
+        isProduction ? "open-front-io-remake.vercel.app" : "localhost:3000",
       ),
       "process.env.GAME_ENV": JSON.stringify(isProduction ? "prod" : "dev"),
       "process.env.STRIPE_PUBLISHABLE_KEY": JSON.stringify(
