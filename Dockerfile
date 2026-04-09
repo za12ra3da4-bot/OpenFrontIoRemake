@@ -21,7 +21,9 @@ FROM node:20-slim
 WORKDIR /usr/src/app
 
 COPY --from=prod-deps /usr/src/app/node_modules ./node_modules
-COPY --from=build /usr/src/app .
+COPY --from=build /usr/src/app ./static
+
+RUN echo "$GIT_COMMIT" > static/commit.txt
 
 CMD ["node", "server.js"]
 
