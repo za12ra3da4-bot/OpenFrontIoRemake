@@ -2,27 +2,29 @@
 # Use an official Node runtime as the base image
 FROM node:20-slim AS prod-deps
 
+# base
+FROM node:20-slim AS base
 WORKDIR /usr/src/app
 COPY package*.json ./
-RUN npm install --only=production
 
-# Build stage - install ALL dependencies and build
+# deps
+FROM base AS prod-deps
+RUN npm install --production
+
+# build
 FROM base AS build
-ENV HUSKY=0
-# Copy package files first for better caching
-COPY package*.json ./
-RUN npm ci
+RUN npm install
+COPY . .
+RUN npm run build
 
-# Copy only what's needed for build
-COPY vite.config.ts ./
-COPY eslint.config.js ./
-COPY index.html ./
-COPY resources ./resources
-COPY proprietary ./proprietary
+# final
+FROM node:20-slim
+WORKDIR /usr/src/app
 
-ARG GIT_COMMIT=unknown
-ENV GIT_COMMIT="$GIT_COMMIT"
-RUN npm run build-prod
+COPY --from=prod-deps /usr/src/app/node_modules ./node_modules
+COPY --from=build /usr/src/app .
+
+CMD ["node", "server.js"]
 
 # Production dependencies stage - separate from build
 FROM base AS build
