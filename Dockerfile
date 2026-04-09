@@ -29,7 +29,7 @@ CMD ["node", "server.js"]
 # Production dependencies stage - separate from build
 FROM base AS prod-deps
 ENV HUSKY=0
-RUN npm install --omit=dev
+RUN npm install --omit=dev --ignore-scripts
 
 RUN apt-get update && apt-get install -y procps
 ENV NPM_CONFIG_IGNORE_SCRIPTS=1
