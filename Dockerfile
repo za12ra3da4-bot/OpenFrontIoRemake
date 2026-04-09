@@ -11,11 +11,10 @@ COPY package*.json ./
 FROM base AS prod-deps
 RUN npm install --production
 
-# build
+# build stage
 FROM base AS build
 RUN npm install
 COPY . .
-RUN npm run build
 
 # final
 FROM node:20-slim
