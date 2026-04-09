@@ -22,8 +22,10 @@ ENV GIT_COMMIT="$GIT_COMMIT"
 RUN npm run build-prod
 
 # Production dependencies stage - separate from build
-FROM base AS prod-deps
+FROM base AS build
 ENV HUSKY=0
+
+RUN apt-get update && apt-get install -y procps
 ENV NPM_CONFIG_IGNORE_SCRIPTS=1
 COPY package*.json ./
 RUN npm ci --omit=dev
