@@ -89,3 +89,4 @@ EOF
 RUN chmod +x /usr/local/bin/start.sh
 ENTRYPOINT ["/usr/local/bin/start.sh"]
 COPY --from=prod-deps /usr/src/app/node_modules ./node_modules
+CMD ["node", "server.js"]
