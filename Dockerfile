@@ -63,7 +63,7 @@ COPY --from=prod-deps /usr/src/app/node_modules ./node_modules
 COPY package*.json ./
 
 # Copy built artifacts from build stage
-COPY --from=build /usr/src/app/static ./static
+COPY --from=build /usr/src/app ./
 
 COPY resources ./resources
 
