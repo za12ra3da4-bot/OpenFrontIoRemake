@@ -1,5 +1,5 @@
 # Use an official Node runtime as the base image
-FROM node:24-slim AS base
+FROM node:20-slim AS base
 WORKDIR /usr/src/app
 
 # Build stage - install ALL dependencies and build
@@ -10,13 +10,11 @@ COPY package*.json ./
 RUN npm ci
 
 # Copy only what's needed for build
-COPY tsconfig.json ./
 COPY vite.config.ts ./
 COPY eslint.config.js ./
 COPY index.html ./
 COPY resources ./resources
 COPY proprietary ./proprietary
-COPY src ./src
 
 ARG GIT_COMMIT=unknown
 ENV GIT_COMMIT="$GIT_COMMIT"
