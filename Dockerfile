@@ -64,7 +64,12 @@ COPY package*.json ./
 
 # Copy built artifacts from build stage
 COPY --from=build /usr/src/app ./
-RUN mkdir -p static && echo "$GIT_COMMIT" > static/commit.txt
+
+# 핵심
+RUN mkdir -p static
+RUN cp -r OpenfrontIO/* static/
+
+RUN echo "$GIT_COMMIT" > static/commit.txt
 
 COPY resources ./resources
 
