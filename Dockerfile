@@ -6,7 +6,7 @@ FROM node:20-slim AS prod-deps
 FROM node:20-slim AS base
 WORKDIR /usr/src/app
 COPY package*.json ./
-
+RUN mkdir -p static && echo "$GIT_COMMIT" > static/commit.txt
 # deps
 FROM base AS prod-deps
 RUN npm install --production
