@@ -1,7 +1,10 @@
 # rebuild
 # Use an official Node runtime as the base image
-FROM node:20-slim AS base
+FROM node:20-slim AS prod-deps
+
 WORKDIR /usr/src/app
+COPY package*.json ./
+RUN npm install --only=production
 
 # Build stage - install ALL dependencies and build
 FROM base AS build
@@ -83,3 +86,4 @@ fi
 EOF
 RUN chmod +x /usr/local/bin/start.sh
 ENTRYPOINT ["/usr/local/bin/start.sh"]
+COPY --from=prod-deps /usr/src/app/node_modules ./node_modules
